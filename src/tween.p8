@@ -109,7 +109,7 @@ function make_tween(inst, paused)
  inst._on_update = inst.on_update
  inst.on_update = on_update_tween
 
- if inst._on_complete then
+ if inst.on_complete then
   inst._on_complete = inst.on_complete
   inst.on_complete = on_complete_tween
  end
