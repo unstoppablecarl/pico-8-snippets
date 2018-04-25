@@ -2,6 +2,14 @@ pico-8 cartridge // http://www.pico-8.com
 version 16
 __lua__
 
+function quad_in(v)
+ return v * v
+end
+
+function quad_out(v)
+ return v * (2 - v)
+end
+
 timers = {}
 
 function update_timers()
@@ -117,7 +125,6 @@ function make_tween(inst, paused)
  inst = make_timer(inst, paused)
  return inst
 end
-
 
 function _init()
  prop = 0
