@@ -18,7 +18,7 @@ function update_timers()
  end
 end
 
-timer = {
+_timer = {
   started = false,
   duration = 1,
   on_start = false,
@@ -29,14 +29,14 @@ timer = {
   start_loop = false
 }
 
-function timer:start()
+function _timer:start()
  self.started = time()
  if self.on_start then
   self.on_start(0, self)
  end
 end
 
-function timer:update()
+function _timer:update()
  if self.start_loop then
     self.start_loop = false
     self:start()
@@ -71,13 +71,13 @@ function timer:update()
  return prog
 end
 
-function timer:delete()
+function _timer:delete()
   del(timers, self)
 end
 
 function make_timer(inst, paused)
 
- setmetatable(inst, {__index = timer})
+ setmetatable(inst, {__index = _timer})
  add(timers, inst)
 
  if not paused then
@@ -86,7 +86,7 @@ function make_timer(inst, paused)
  return inst
 end
 
-function tween_value(from, to, ease, progress)
+function tween_value(from, to, progress, ease)
  if ease then
   progress = ease(progress)
  end
@@ -94,32 +94,26 @@ function tween_value(from, to, ease, progress)
  return from + (to - from) * progress
 end
 
-function on_start_tween(progress, timer)
-   timer._on_start(timer.from, progress, timer)
- end
-
-function on_update_tween(progress, timer)
-   local value = tween_value(timer.from, timer.to, timer.ease, progress)
-   timer._on_update(value, progress, timer)
- end
-
- function on_complete_tween(progress, timer)
-   timer._on_complete(timer.to, progress, timer)
- end
-
 function make_tween(inst, paused)
  
  if inst.on_start then
   inst._on_start = inst.on_start
-  inst.on_start = on_start_tween
+  inst.on_start = function (progress, timer)
+   timer._on_start(timer.from, progress, timer)
+  end
  end
 
  inst._on_update = inst.on_update
- inst.on_update = on_update_tween
+ inst.on_update = function (progress, timer)
+   local value = tween_value(timer.from, timer.to, progress, timer.ease)
+   timer._on_update(value, progress, timer)
+ end
 
  if inst.on_complete then
   inst._on_complete = inst.on_complete
-  inst.on_complete = on_complete_tween
+  inst.on_complete = function(progress, timer)
+   timer._on_complete(timer.to, progress, timer)
+  end
  end
 
  inst = make_timer(inst, paused)
