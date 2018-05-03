@@ -13,8 +13,8 @@ end
 timers = {}
 
 function update_timers()
- for t in all(timers) do
-  t:update()
+ for i=1,#timers do
+  timers[i]:update()
  end
 end
 
